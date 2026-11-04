@@ -107,7 +107,9 @@ Hospital appointment management system/
 │   ├── admin.py            # Admin operations and doctor roster logic
 │   └── database.py         # Database connection and table creation
 ├── docs/
-│   └── VIVA_PREPARATION_GUIDE.md  # Answers to common viva questions
+│   ├── JIRA_AGILE_DOCUMENTATION.md # Agile Scrum Backlog, Sprint 1 & 2, Burndown, Retrospective
+│   ├── VIVA_PREPARATION_GUIDE.md  # Answers to common viva questions
+│   └── TEST_REPORT_AND_DEFECT_LOG.md # QA test execution report & defect history
 ├── tests/                  # Automated test files
 ├── mediflow.db             # SQLite database storing all project data
 ├── run.py                  # Main Python file to run the server
@@ -132,4 +134,10 @@ If the examiner asks:
 * **How are passwords stored?**  
   Securely hashed using `PBKDF2-SHA256` (passwords are never saved in plain text).
 
-*(For a deeper list of 20+ viva questions with ready answers, check [docs/VIVA_PREPARATION_GUIDE.md](docs/VIVA_PREPARATION_GUIDE.md))*
+---
+
+## 📋 Project Documentation Links
+* 👉 [JIRA & Agile Scrum Execution Dossier](docs/JIRA_AGILE_DOCUMENTATION.md) (Backlog, Sprints, Burndown, Retrospective)
+* 👉 [Viva Voce Technical Defense Guide](docs/VIVA_PREPARATION_GUIDE.md) (20+ questions with answers)
+* 👉 [QA Test Execution Report & Defect Log](docs/TEST_REPORT_AND_DEFECT_LOG.md) (Automated test matrix)
+
