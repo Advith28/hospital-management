@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% block title %}Patient Portal — MetroCare General Hospital{% endblock %}
+
+{% block content %}
+<div class="page-title-bar">
+  <div class="container">
+    <div>
+      <h1 class="page-heading">Patient Consultation Portal</h1>
+      <div class="page-subheading">Patient: <strong>{{ session.get('full_name') }}</strong> &bull; Medical Record Profile</div>
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <a href="{{ url_for('patient.profile') }}" class="btn btn-secondary btn-sm">Edit Vitals / Profile</a>
+      <a href="{{ url_for('patient.book_appointment') }}" class="btn btn-primary btn-sm">+ Book New Visit</a>
+    </div>
+  </div>
+</div>
+
+<div class="container" style="padding-bottom: 30px;">
+  <!-- Outpatient Summary Strip -->
+  <div class="kpi-strip">
+    <div class="kpi-box">
+      <div class="kpi-number">{{ upcoming_count }}</div>
+      <div class="kpi-label">Upcoming Scheduled Visits</div>
+    </div>
+    <div class="kpi-box green">
+      <div class="kpi-number">{{ completed_count }}</div>
+      <div class="kpi-label">Completed Consultations</div>
+    </div>
+    <div class="kpi-box teal">
+      <div class="kpi-number">{{ total_count }}</div>
+      <div class="kpi-label">Total Appointments On Record</div>
+    </div>
+    <div class="kpi-box">
+      <div class="kpi-number">{{ patient.blood_group or 'N/A' }}</div>
+      <div class="kpi-label">Blood Group Recorded</div>
+    </div>
+  </div>
+
+  <!-- Appointments Table Panel -->
+  <div class="hospital-panel">
+    <div class="panel-header">
+      <h2 class="panel-title">Outpatient Appointment History</h2>
+      <a href="{{ url_for('patient.book_appointment') }}" class="btn btn-primary btn-sm">+ Schedule Visit</a>
+    </div>
+
+    {% if appointments %}
+      <div class="table-wrapper" style="border: none;">
+        <table class="hospital-table">
+          <thead>
+            <tr>
+              <th style="width: 130px;">Appt Reference</th>
+              <th>Physician & Specialty</th>
+              <th style="width: 140px;">Consultation Date</th>
+              <th style="width: 100px;">Status</th>
+              <th>Patient Symptoms / Reason</th>
+              <th>Diagnosis & Prescription (Rx)</th>
+              <th style="width: 150px; text-align: center;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for a in appointments %}
+            <tr>
+              <td>
+                <strong style="color: var(--hospital-navy); font-family: monospace;">{{ a.appointment_number }}</strong>
+              </td>
+              <td>
+                <strong>{{ a.doctor_name }}</strong>
+                <div style="font-size: 11px; color: var(--text-muted);">{{ a.department_name }} &bull; {{ a.specialization }}</div>
+              </td>
+              <td>
+                <div>{{ a.appointment_date }}</div>
+                <div style="font-size: 11px; color: var(--text-muted); font-weight: 600;">{{ a.appointment_time }}</div>
+              </td>
+              <td>
+                <span class="status-badge status-{{ a.status|lower }}">{{ a.status }}</span>
+              </td>
+              <td style="font-size: 12px; color: var(--text-secondary); max-width: 200px;">
+                {{ a.symptoms or 'General consultation' }}
+              </td>
+              <td style="font-size: 12px; max-width: 240px;">
+                {% if a.doctor_notes or a.prescription %}
+                  <div style="background-color: var(--bg-subtle); border-left: 3px solid var(--status-completed); padding: 6px 8px; font-size: 11px;">
+                    {% if a.doctor_notes %}
+                      <div><strong>Diagnosis:</strong> {{ a.doctor_notes }}</div>
+                    {% endif %}
+                    {% if a.prescription %}
+                      <div style="margin-top: 3px; color: var(--hospital-teal);"><strong>Rx:</strong> {{ a.prescription }}</div>
+                    {% endif %}
+                  </div>
+                {% else %}
+                  <span style="color: var(--text-muted); font-size: 11px; font-style: italic;">Awaiting doctor examination</span>
+                {% endif %}
+              </td>
+              <td style="text-align: center;">
+                {% if a.status in ('Scheduled', 'Rescheduled') %}
+                  <div style="display: flex; gap: 4px; justify-content: center;">
+                    <a href="{{ url_for('patient.reschedule', appointment_id=a.id) }}" class="btn btn-secondary btn-sm" title="Change date/time">
+                      Reschedule
+                    </a>
+                    <form method="POST" action="{{ url_for('patient.cancel_appointment', appointment_id=a.id) }}" onsubmit="return confirm('Confirm cancellation of appointment {{ a.appointment_number }}?');" style="display: inline;">
+                      <button type="submit" class="btn btn-outline-danger btn-sm">Cancel</button>
+                    </form>
+                  </div>
+                {% else %}
+                  <span style="font-size: 11px; color: var(--text-muted);">Completed</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="panel-body" style="text-align: center; padding: 36px 16px;">
+        <h3 style="font-size: 14px; font-weight: 700; color: var(--text-dark);">No Consultations on Record</h3>
+        <p style="font-size: 12px; color: var(--text-muted); margin: 4px 0 14px 0;">You do not currently have any scheduled or completed hospital appointments.</p>
+        <a href="{{ url_for('patient.book_appointment') }}" class="btn btn-primary btn-sm">Schedule First Appointment</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

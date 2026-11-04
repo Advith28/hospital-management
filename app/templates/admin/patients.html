@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}Patient Demographic Registry — MetroCare General Hospital{% endblock %}
+
+{% block content %}
+<div class="page-title-bar">
+  <div class="container">
+    <div>
+      <h1 class="page-heading">Hospital Outpatient Demographic Registry</h1>
+      <div class="page-subheading">Centralized demographic records, blood groups, and appointment counts of all enrolled patients.</div>
+    </div>
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary btn-sm">&larr; Back to Dashboard</a>
+  </div>
+</div>
+
+<div class="container" style="padding-bottom: 40px;">
+  <div class="hospital-panel">
+    <div class="panel-header">
+      <h2 class="panel-title">Registered Patients on File ({{ patients|length }})</h2>
+    </div>
+
+    {% if patients %}
+      <div class="table-wrapper" style="border: none;">
+        <table class="hospital-table">
+          <thead>
+            <tr>
+              <th>Patient Full Name</th>
+              <th>Email & Contact Phone</th>
+              <th>Gender & DOB</th>
+              <th>Blood Group</th>
+              <th>Emergency Contact</th>
+              <th>Residential Address</th>
+              <th style="text-align: center;">Total Visits</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in patients %}
+            <tr>
+              <td>
+                <strong>{{ p.full_name }}</strong>
+                <div style="font-size: 11px; color: var(--text-muted);">Enrolled: {{ p.registered_on[:10] }}</div>
+              </td>
+              <td>
+                <div>{{ p.email }}</div>
+                <div style="font-size: 11px; color: var(--text-muted);">{{ p.phone or 'No phone on file' }}</div>
+              </td>
+              <td>
+                <div>{{ p.gender or 'Unspecified' }}</div>
+                <div style="font-size: 11px; color: var(--text-muted);">DOB: {{ p.dob or 'N/A' }}</div>
+              </td>
+              <td>
+                <span class="status-badge" style="background:#EEF2F6;">{{ p.blood_group or 'N/A' }}</span>
+              </td>
+              <td style="font-size: 12px;">{{ p.emergency_contact or 'N/A' }}</td>
+              <td style="font-size: 12px; max-width: 200px;">{{ p.address or 'N/A' }}</td>
+              <td style="text-align: center;">
+                <span class="status-badge status-scheduled">{{ p.total_appointments }} Visit{{ 's' if p.total_appointments != 1 else '' }}</span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="panel-body" style="text-align: center; padding: 30px;">
+        <p style="color: var(--text-muted); font-size: 13px;">No patient demographic records registered in hospital database.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

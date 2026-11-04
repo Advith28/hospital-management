@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Reschedule Consultation — MetroCare General Hospital{% endblock %}
+
+{% block content %}
+<div class="page-title-bar">
+  <div class="container">
+    <div>
+      <h1 class="page-heading">Reschedule Appointment #{{ appt.appointment_number }}</h1>
+      <div class="page-subheading">Attending Physician: <strong>{{ appt.doctor_name }}</strong> ({{ appt.department_name }})</div>
+    </div>
+    <a href="{{ url_for('patient.dashboard') }}" class="btn btn-secondary btn-sm">&larr; Back to Appointments</a>
+  </div>
+</div>
+
+<div class="container" style="max-width: 680px; padding-bottom: 40px;">
+  <div class="hospital-panel">
+    <div class="panel-header">
+      <h2 class="panel-title">Current Booking Details</h2>
+    </div>
+    <div class="panel-body" style="font-size: 13px; background-color: var(--bg-subtle); border-bottom: 1px solid var(--border-color);">
+      Currently Scheduled For: <strong>{{ appt.appointment_date }}</strong> at <strong>{{ appt.appointment_time }}</strong>
+    </div>
+
+    <div class="panel-body">
+      <form method="POST" action="{{ url_for('patient.reschedule', appointment_id=appt.id) }}">
+        <input type="hidden" id="doctor_select" value="{{ appt.doc_id }}">
+
+        <div class="form-group">
+          <label class="form-label" for="appointment_date">Select New Date <span class="req">*</span></label>
+          <input type="date" id="appointment_date" name="appointment_date" class="form-control" min="{{ min_date }}" max="{{ max_date }}" value="{{ appt.appointment_date }}" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Select New Time Slot <span class="req">*</span></label>
+          <input type="hidden" id="appointment_time" name="appointment_time" value="{{ appt.appointment_time }}" required>
+          <div id="slots_container" class="slot-container" style="min-height: 50px; padding: 10px; background-color: #FAFAFA; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+            <div style="font-size: 12px; color: var(--text-muted); grid-column: 1/-1;">
+              Loading open consultation slots...
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+          <a href="{{ url_for('patient.dashboard') }}" class="btn btn-secondary">Cancel</a>
+          <button type="submit" class="btn btn-primary">
+            Save Rescheduled Appointment
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

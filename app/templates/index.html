@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+{% block title %}MetroCare General Hospital — Outpatient Services & Doctor Appointments{% endblock %}
+
+{% block content %}
+<!-- Welcome & Quick Booking Banner -->
+<section style="background-color: #FFFFFF; border-bottom: 1px solid var(--border-color); padding: 28px 0;">
+  <div class="container" style="display: grid; grid-template-columns: 1.3fr 1fr; gap: 32px; align-items: center;">
+    <div>
+      <span style="font-size: 12px; font-weight: 700; color: var(--hospital-teal); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 6px;">
+        Outpatient Care & Specialist Consultation
+      </span>
+      <h1 style="font-size: 26px; font-weight: 700; color: var(--hospital-navy); line-height: 1.25; margin-bottom: 12px;">
+        Welcome to MetroCare General Hospital
+      </h1>
+      <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 18px;">
+        MetroCare provides outpatient healthcare services across 6 specialized departments. Registered patients can review attending physician schedules, book confirmed consultation slots, and access electronic prescriptions and diagnosis summaries.
+      </p>
+
+      <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <a href="{{ url_for('patient.book_appointment') if session.get('role') == 'patient' else url_for('auth.login') }}" class="btn btn-primary">
+          Book an Appointment
+        </a>
+        <a href="{{ url_for('main.doctors') }}" class="btn btn-secondary">
+          View Doctor Directory
+        </a>
+      </div>
+    </div>
+
+    <!-- OPD Operations Quick Info Box -->
+    <div class="hospital-panel" style="margin-bottom: 0;">
+      <div class="panel-header">
+        <h2 class="panel-title">Outpatient Department (OPD) Notice</h2>
+        <span class="status-badge status-completed">Roster Active</span>
+      </div>
+      <div class="panel-body" style="font-size: 13px; line-height: 1.6;">
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px;">
+          <tr>
+            <td style="padding: 4px 0; color: var(--text-muted); width: 140px;">Standard Shift:</td>
+            <td style="padding: 4px 0; font-weight: 600;">08:30 AM – 05:00 PM</td>
+          </tr>
+          <tr>
+            <td style="padding: 4px 0; color: var(--text-muted);">Consultation Slots:</td>
+            <td style="padding: 4px 0; font-weight: 600;">30-minute intervals</td>
+          </tr>
+          <tr>
+            <td style="padding: 4px 0; color: var(--text-muted);">Available Specialties:</td>
+            <td style="padding: 4px 0; font-weight: 600;">Cardiology, Neurology, Ortho, Peds, Derma, Gen Med</td>
+          </tr>
+          <tr>
+            <td style="padding: 4px 0; color: var(--text-muted);">Emergency Desk:</td>
+            <td style="padding: 4px 0; font-weight: 600; color: var(--status-cancelled);">Trauma Center (Gate 2)</td>
+          </tr>
+        </table>
+        <div style="background-color: var(--hospital-teal-light); border-left: 3px solid var(--hospital-teal); padding: 8px 12px; font-size: 12px; color: var(--hospital-teal);">
+          Patients must complete registration before their first booking to maintain their clinical record.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Clinical Summary Bar -->
+<section style="background-color: #F8F9FA; border-bottom: 1px solid var(--border-color); padding: 16px 0;">
+  <div class="container">
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+      <div class="kpi-box">
+        <div class="kpi-number">{{ stats.doctors_count }}</div>
+        <div class="kpi-label">Attending Physicians</div>
+      </div>
+      <div class="kpi-box teal">
+        <div class="kpi-number">{{ stats.departments_count }}</div>
+        <div class="kpi-label">Clinical Departments</div>
+      </div>
+      <div class="kpi-box">
+        <div class="kpi-number">{{ stats.patients_count }}</div>
+        <div class="kpi-label">Registered Patients</div>
+      </div>
+      <div class="kpi-box green">
+        <div class="kpi-number">{{ stats.appointments_count }}</div>
+        <div class="kpi-label">Consultations Managed</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Main Sections: Departments & Doctors -->
+<section style="padding: 24px 0;">
+  <div class="container" style="display: grid; grid-template-columns: 2fr 1.1fr; gap: 24px;">
+    <!-- Left: Featured Physicians Table -->
+    <div>
+      <div class="hospital-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Attending Physicians on Duty</h2>
+          <a href="{{ url_for('main.doctors') }}" style="font-size: 12px; font-weight: 600;">View All Doctors &rarr;</a>
+        </div>
+        <div class="table-wrapper" style="border: none;">
+          <table class="hospital-table">
+            <thead>
+              <tr>
+                <th>Physician</th>
+                <th>Department</th>
+                <th>Qualifications</th>
+                <th>Fee</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for doc in doctors %}
+              <tr>
+                <td>
+                  <strong>{{ doc.full_name }}</strong>
+                  <div style="font-size: 11px; color: var(--text-muted);">{{ doc.specialization }}</div>
+                </td>
+                <td>{{ doc.department_name }}</td>
+                <td style="font-size: 12px;">{{ doc.qualification }}</td>
+                <td><strong>₹{{ "%.0f"|format(doc.consultation_fee) }}</strong></td>
+                <td>
+                  <a href="{{ url_for('patient.book_appointment', doctor_id=doc.id) }}" class="btn btn-primary btn-sm">
+                    Book
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Clinical Departments Overview -->
+      <div class="hospital-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Hospital Clinical Departments</h2>
+          <a href="{{ url_for('main.departments') }}" style="font-size: 12px; font-weight: 600;">All Departments &rarr;</a>
+        </div>
+        <div class="panel-body">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            {% for dept in departments %}
+            <div style="border: 1px solid var(--border-light); padding: 10px 12px; background: #FFFFFF; border-radius: var(--radius-xs);">
+              <div style="font-weight: 700; color: var(--hospital-navy); font-size: 13px; margin-bottom: 2px;">
+                {{ dept.name }}
+              </div>
+              <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px; line-height: 1.4;">
+                {{ dept.description[:95] }}...
+              </p>
+              <a href="{{ url_for('main.doctors', department=dept.id) }}" style="font-size: 11px; font-weight: 600; color: var(--hospital-teal);">
+                Department Doctors &rarr;
+              </a>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Hospital Info & Workflow Box -->
+    <div>
+      <div class="hospital-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Appointment Procedure</h2>
+        </div>
+        <div class="panel-body" style="font-size: 13px; line-height: 1.6;">
+          <ol style="padding-left: 18px; margin: 0 0 14px 0; color: var(--text-secondary);">
+            <li style="margin-bottom: 8px;">
+              <strong>Patient Enrollment:</strong> Register once with basic demographic details and emergency contact.
+            </li>
+            <li style="margin-bottom: 8px;">
+              <strong>Physician & Slot Selection:</strong> Choose clinical department and pick an available date and time slot.
+            </li>
+            <li style="margin-bottom: 8px;">
+              <strong>Check-in & Consultation:</strong> Arrive at the OPD reception on time for doctor consultation.
+            </li>
+            <li>
+              <strong>Digital Prescription:</strong> Doctor enters clinical findings and prescription directly to your profile.
+            </li>
+          </ol>
+          <div style="border-top: 1px solid var(--border-light); padding-top: 10px; font-size: 12px; color: var(--text-muted);">
+            Need assistance? Contact the reception desk at (555) 019-2834 or visit Hall A, Ground Floor.
+          </div>
+        </div>
+      </div>
+
+      <div class="hospital-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Accreditation & Standards</h2>
+        </div>
+        <div class="panel-body" style="font-size: 12px; color: var(--text-secondary); line-height: 1.5;">
+          <p style="margin-bottom: 8px;">
+            MetroCare General Hospital complies with international outpatient management standards, data confidentiality protocols, and automated double-booking prevention.
+          </p>
+          <div style="font-size: 11px; color: var(--text-muted);">
+            • NABH / JCI Aligned Clinical Process<br>
+            • Certified Medical Specialists<br>
+            • Secure Electronic Medical Notes
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

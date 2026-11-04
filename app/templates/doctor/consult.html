@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block title %}Clinical Examination & Rx — MetroCare General Hospital{% endblock %}
+
+{% block content %}
+<div class="page-title-bar">
+  <div class="container">
+    <div>
+      <h1 class="page-heading">Clinical Consultation Entry — Appt #{{ appt.appointment_number }}</h1>
+      <div class="page-subheading">Patient: <strong>{{ appt.patient_name }}</strong> &bull; Scheduled: {{ appt.appointment_date }} at {{ appt.appointment_time }}</div>
+    </div>
+    <a href="{{ url_for('doctor.dashboard') }}" class="btn btn-secondary btn-sm">&larr; Back to Agenda</a>
+  </div>
+</div>
+
+<div class="container" style="padding-bottom: 40px;">
+  <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px;">
+    <!-- Patient Medical Summary -->
+    <div>
+      <div class="hospital-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Patient Identification & Vitals</h2>
+        </div>
+        <div class="panel-body" style="font-size: 13px; line-height: 1.8;">
+          <div><strong>Patient Name:</strong> {{ appt.patient_name }}</div>
+          <div><strong>Gender:</strong> {{ appt.gender or 'Not specified' }}</div>
+          <div><strong>Date of Birth:</strong> {{ appt.dob or 'Not specified' }}</div>
+          <div><strong>Blood Group:</strong> <span class="status-badge" style="background:#EEF2F6;">{{ appt.blood_group or 'Unknown' }}</span></div>
+          <div><strong>Contact Telephone:</strong> {{ appt.patient_phone or 'N/A' }}</div>
+          <div><strong>Address:</strong> {{ appt.address or 'N/A' }}</div>
+          <div><strong>Emergency Contact:</strong> {{ appt.emergency_contact or 'N/A' }}</div>
+        </div>
+      </div>
+
+      <div class="hospital-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Reported Chief Complaints</h2>
+        </div>
+        <div class="panel-body" style="font-size: 13px; color: var(--text-dark); background-color: var(--bg-subtle);">
+          {{ appt.symptoms or 'No specific symptoms described by patient.' }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Doctor Consultation Form -->
+    <div>
+      <div class="hospital-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Clinical Findings & Prescription Recording</h2>
+        </div>
+        <div class="panel-body">
+          <form method="POST" action="{{ url_for('doctor.consult', appointment_id=appt.id) }}">
+            <div class="form-group">
+              <label class="form-label" for="doctor_notes">Clinical Observations, Examination & Diagnosis <span class="req">*</span></label>
+              <textarea id="doctor_notes" name="doctor_notes" class="form-control" style="min-height: 110px;" placeholder="Document patient vitals, diagnosis, clinical evaluation, and follow-up guidance..." required>{{ appt.doctor_notes or '' }}</textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="prescription">Electronic Prescription Lines (Rx) <span class="req">*</span></label>
+              <textarea id="prescription" name="prescription" class="form-control" style="min-height: 100px;" placeholder="Medicine name, dosage, frequency, course duration (e.g., Amoxicillin 500mg tid x 5 days)..." required>{{ appt.prescription or '' }}</textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="status">Appointment Status</label>
+              <select id="status" name="status" class="form-select">
+                <option value="Completed" {% if appt.status == 'Completed' %}selected{% endif %}>Completed (Consultation Finished)</option>
+                <option value="Scheduled" {% if appt.status == 'Scheduled' %}selected{% endif %}>Scheduled (In Progress / Pending)</option>
+                <option value="Cancelled" {% if appt.status == 'Cancelled' %}selected{% endif %}>Cancelled (Patient No-Show)</option>
+              </select>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+              <a href="{{ url_for('doctor.dashboard') }}" class="btn btn-secondary">Cancel</a>
+              <button type="submit" class="btn btn-primary">Save Clinical Record</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Past Consultations at Hospital -->
+      {% if history %}
+      <div class="hospital-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Prior Consultations for this Patient</h2>
+        </div>
+        <div class="table-wrapper" style="border: none;">
+          <table class="hospital-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Physician</th>
+                <th>Status</th>
+                <th>Diagnosis Summary</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for h in history %}
+              <tr>
+                <td>{{ h.appointment_date }}</td>
+                <td>{{ h.doctor_name }} ({{ h.specialization }})</td>
+                <td><span class="status-badge status-{{ h.status|lower }}">{{ h.status }}</span></td>
+                <td style="font-size: 12px;">{{ h.doctor_notes or 'No notes recorded' }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block title %}Hospital Administrative Console — MetroCare General Hospital{% endblock %}
+
+{% block content %}
+<div class="page-title-bar">
+  <div class="container">
+    <div>
+      <h1 class="page-heading">Hospital Administrative Operations Console</h1>
+      <div class="page-subheading">Centralized oversight of physician rosters, outpatient volume, and clinical departments.</div>
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <a href="{{ url_for('admin.doctors') }}" class="btn btn-secondary btn-sm">Physicians Roster</a>
+      <a href="{{ url_for('admin.patients') }}" class="btn btn-secondary btn-sm">Patient Registry</a>
+      <a href="{{ url_for('admin.appointments') }}" class="btn btn-primary btn-sm">Master Appointments</a>
+    </div>
+  </div>
+</div>
+
+<div class="container" style="padding-bottom: 30px;">
+  <!-- Operational Metrics Strip -->
+  <div class="kpi-strip">
+    <div class="kpi-box">
+      <div class="kpi-number">{{ total_doctors }}</div>
+      <div class="kpi-label">Active Physicians</div>
+    </div>
+    <div class="kpi-box teal">
+      <div class="kpi-number">{{ total_patients }}</div>
+      <div class="kpi-label">Registered Patients</div>
+    </div>
+    <div class="kpi-box green">
+      <div class="kpi-number">{{ total_appointments }}</div>
+      <div class="kpi-label">Total Outpatient Visits</div>
+    </div>
+    <div class="kpi-box">
+      <div class="kpi-number">{{ total_departments }}</div>
+      <div class="kpi-label">Clinical Departments</div>
+    </div>
+  </div>
+
+  <!-- Status Distribution Bar -->
+  <div class="hospital-panel" style="margin-bottom: 20px;">
+    <div class="panel-body" style="padding: 12px 18px; display: flex; justify-content: space-around; align-items: center; background-color: #FFFFFF;">
+      <div style="text-align: center;">
+        <span class="status-badge status-scheduled" style="font-size: 13px;">{{ scheduled_count }} Active / Scheduled</span>
+      </div>
+      <div style="width: 1px; height: 24px; background: var(--border-color);"></div>
+      <div style="text-align: center;">
+        <span class="status-badge status-completed" style="font-size: 13px;">{{ completed_count }} Completed Visits</span>
+      </div>
+      <div style="width: 1px; height: 24px; background: var(--border-color);"></div>
+      <div style="text-align: center;">
+        <span class="status-badge status-cancelled" style="font-size: 13px;">{{ cancelled_count }} Cancelled Bookings</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 2fr 1.2fr; gap: 20px;">
+    <!-- Recent System Appointments -->
+    <div class="hospital-panel">
+      <div class="panel-header">
+        <h2 class="panel-title">Recent Outpatient Consultations</h2>
+        <a href="{{ url_for('admin.appointments') }}" class="btn btn-secondary btn-sm">All Consultations &rarr;</a>
+      </div>
+      <div class="table-wrapper" style="border: none;">
+        <table class="hospital-table">
+          <thead>
+            <tr>
+              <th>Appt #</th>
+              <th>Patient</th>
+              <th>Physician</th>
+              <th>Date & Time</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for a in recent_appts %}
+            <tr>
+              <td><code>{{ a.appointment_number }}</code></td>
+              <td><strong>{{ a.patient_name }}</strong></td>
+              <td>{{ a.doctor_name }}</td>
+              <td>{{ a.appointment_date }} {{ a.appointment_time }}</td>
+              <td><span class="status-badge status-{{ a.status|lower }}">{{ a.status }}</span></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Department Load Distribution -->
+    <div class="hospital-panel">
+      <div class="panel-header">
+        <h2 class="panel-title">Department Consultation Load</h2>
+        <a href="{{ url_for('admin.departments') }}" class="btn btn-secondary btn-sm">Departments</a>
+      </div>
+      <div class="table-wrapper" style="border: none;">
+        <table class="hospital-table">
+          <thead>
+            <tr>
+              <th>Department</th>
+              <th>Staff</th>
+              <th style="text-align: right;">Total Visits</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for d in dept_stats %}
+            <tr>
+              <td><strong>{{ d.name }}</strong></td>
+              <td>{{ d.doctor_count }} Attending</td>
+              <td style="text-align: right;">
+                <span class="status-badge status-scheduled">{{ d.appt_count }}</span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

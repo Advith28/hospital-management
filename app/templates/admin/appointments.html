@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block title %}Master Appointments Oversight — MetroCare General Hospital{% endblock %}
+
+{% block content %}
+<div class="page-title-bar">
+  <div class="container">
+    <div>
+      <h1 class="page-heading">Hospital Master Appointment Oversight</h1>
+      <div class="page-subheading">Centralized supervision of all outpatient bookings across departments, status updates, and calendar audits.</div>
+    </div>
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary btn-sm">&larr; Back to Dashboard</a>
+  </div>
+</div>
+
+<div class="container" style="padding-bottom: 40px;">
+  <!-- Filter Toolbar -->
+  <div class="hospital-panel" style="margin-bottom: 16px;">
+    <div class="panel-body" style="padding: 12px 16px;">
+      <form method="GET" action="{{ url_for('admin.appointments') }}" style="display: grid; grid-template-columns: 1fr 1fr auto auto; gap: 10px; align-items: flex-end;">
+        <div>
+          <label class="form-label" style="font-size: 12px; margin-bottom: 2px;">Filter by Consultation Status</label>
+          <select name="status" class="form-select">
+            <option value="">All Statuses</option>
+            <option value="Scheduled" {% if status_filter == 'Scheduled' %}selected{% endif %}>Scheduled</option>
+            <option value="Completed" {% if status_filter == 'Completed' %}selected{% endif %}>Completed</option>
+            <option value="Cancelled" {% if status_filter == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+            <option value="Rescheduled" {% if status_filter == 'Rescheduled' %}selected{% endif %}>Rescheduled</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="form-label" style="font-size: 12px; margin-bottom: 2px;">Filter by Specific Date</label>
+          <input type="date" name="date" class="form-control" value="{{ date_filter }}">
+        </div>
+
+        <div>
+          <button type="submit" class="btn btn-primary" style="height: 33px;">Apply Filter</button>
+        </div>
+
+        <div>
+          <a href="{{ url_for('admin.appointments') }}" class="btn btn-secondary" style="height: 33px;">Clear Filter</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Master Appointments Table -->
+  <div class="hospital-panel">
+    <div class="panel-header">
+      <h2 class="panel-title">Master Outpatient Consultation Roster ({{ appointments|length }})</h2>
+    </div>
+
+    {% if appointments %}
+      <div class="table-wrapper" style="border: none;">
+        <table class="hospital-table">
+          <thead>
+            <tr>
+              <th style="width: 130px;">Appt Ref</th>
+              <th>Patient</th>
+              <th>Physician & Dept</th>
+              <th style="width: 140px;">Date & Time</th>
+              <th style="width: 100px;">Current Status</th>
+              <th>Reported Issue</th>
+              <th style="width: 180px; text-align: center;">Administrative Status Override</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for a in appointments %}
+            <tr>
+              <td><code>{{ a.appointment_number }}</code></td>
+              <td>
+                <strong>{{ a.patient_name }}</strong>
+                <div style="font-size: 11px; color: var(--text-muted);">{{ a.patient_phone }}</div>
+              </td>
+              <td>
+                <div>{{ a.doctor_name }}</div>
+                <div style="font-size: 11px; color: var(--text-muted);">{{ a.department_name }}</div>
+              </td>
+              <td>
+                <div>{{ a.appointment_date }}</div>
+                <div style="font-size: 11px; color: var(--text-muted); font-weight: 600;">{{ a.appointment_time }}</div>
+              </td>
+              <td>
+                <span class="status-badge status-{{ a.status|lower }}">{{ a.status }}</span>
+              </td>
+              <td style="font-size: 12px; color: var(--text-secondary); max-width: 180px;">
+                {{ a.symptoms or 'Routine Consultation' }}
+              </td>
+              <td style="text-align: center;">
+                <form method="POST" action="{{ url_for('admin.update_appointment_status', appointment_id=a.id) }}" style="display: flex; gap: 4px; justify-content: center; align-items: center;">
+                  <select name="status" class="form-select" style="padding: 3px 6px; font-size: 11px; width: 110px; height: 28px;">
+                    <option value="Scheduled" {% if a.status == 'Scheduled' %}selected{% endif %}>Scheduled</option>
+                    <option value="Completed" {% if a.status == 'Completed' %}selected{% endif %}>Completed</option>
+                    <option value="Cancelled" {% if a.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                    <option value="Rescheduled" {% if a.status == 'Rescheduled' %}selected{% endif %}>Rescheduled</option>
+                  </select>
+                  <button type="submit" class="btn btn-secondary btn-sm" style="padding: 2px 7px;">Save</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="panel-body" style="text-align: center; padding: 30px;">
+        <p style="color: var(--text-muted); font-size: 13px;">No consultation records match the selected filter parameters.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

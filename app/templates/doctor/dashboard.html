@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% block title %}Physician Clinical Console — MetroCare General Hospital{% endblock %}
+
+{% block content %}
+<div class="page-title-bar">
+  <div class="container">
+    <div>
+      <h1 class="page-heading">Physician Clinical Portal — {{ doctor.full_name }}</h1>
+      <div class="page-subheading">{{ doctor.department_name }} &bull; {{ doctor.specialization }} ({{ doctor.qualification }})</div>
+    </div>
+    <a href="{{ url_for('doctor.schedule') }}" class="btn btn-secondary btn-sm">Clinic Schedule & Fees</a>
+  </div>
+</div>
+
+<div class="container" style="padding-bottom: 30px;">
+  <!-- Outpatient Workload Metrics -->
+  <div class="kpi-strip">
+    <div class="kpi-box">
+      <div class="kpi-number">{{ today_appointments|length }}</div>
+      <div class="kpi-label">Today's Scheduled Consultations</div>
+    </div>
+    <div class="kpi-box teal">
+      <div class="kpi-number">{{ upcoming_count }}</div>
+      <div class="kpi-label">Future Outpatient Appointments</div>
+    </div>
+    <div class="kpi-box green">
+      <div class="kpi-number">{{ completed_count }}</div>
+      <div class="kpi-label">Completed Consultations</div>
+    </div>
+    <div class="kpi-box">
+      <div class="kpi-number">{{ total_patients_seen }}</div>
+      <div class="kpi-label">Distinct Patients Managed</div>
+    </div>
+  </div>
+
+  <!-- Today's Consultations List -->
+  {% if today_appointments %}
+  <div class="hospital-panel" style="border-top: 3px solid var(--hospital-teal);">
+    <div class="panel-header">
+      <h2 class="panel-title">Today's Outpatient Queue ({{ today_str }})</h2>
+    </div>
+    <div class="table-wrapper" style="border: none;">
+      <table class="hospital-table">
+        <thead>
+          <tr>
+            <th style="width: 90px;">Time</th>
+            <th style="width: 130px;">Appt #</th>
+            <th>Patient Name & Demographics</th>
+            <th>Reported Symptoms</th>
+            <th style="width: 100px;">Status</th>
+            <th style="width: 130px; text-align: center;">Clinical Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for a in today_appointments %}
+          <tr>
+            <td><strong>{{ a.appointment_time }}</strong></td>
+            <td><code>{{ a.appointment_number }}</code></td>
+            <td>
+              <strong>{{ a.patient_name }}</strong>
+              <div style="font-size: 11px; color: var(--text-muted);">{{ a.gender }}, Blood: {{ a.blood_group or 'N/A' }}</div>
+            </td>
+            <td style="font-size: 12px; color: var(--text-secondary); max-width: 250px;">{{ a.symptoms or 'No notes provided' }}</td>
+            <td>
+              <span class="status-badge status-{{ a.status|lower }}">{{ a.status }}</span>
+            </td>
+            <td style="text-align: center;">
+              <a href="{{ url_for('doctor.consult', appointment_id=a.id) }}" class="btn btn-primary btn-sm">
+                Examine / Rx &rarr;
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Complete Outpatient Consultations Archive -->
+  <div class="hospital-panel">
+    <div class="panel-header">
+      <h2 class="panel-title">Assigned Outpatient Appointments</h2>
+    </div>
+
+    {% if appointments %}
+      <div class="table-wrapper" style="border: none;">
+        <table class="hospital-table">
+          <thead>
+            <tr>
+              <th style="width: 130px;">Appt Reference</th>
+              <th>Patient</th>
+              <th style="width: 140px;">Date & Time</th>
+              <th style="width: 100px;">Status</th>
+              <th>Reported Symptoms</th>
+              <th>Clinical Findings & Rx</th>
+              <th style="width: 120px; text-align: center;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for a in appointments %}
+            <tr>
+              <td><code>{{ a.appointment_number }}</code></td>
+              <td>
+                <strong>{{ a.patient_name }}</strong>
+                <div style="font-size: 11px; color: var(--text-muted);">{{ a.patient_phone }}</div>
+              </td>
+              <td>
+                <div>{{ a.appointment_date }}</div>
+                <div style="font-size: 11px; color: var(--text-muted);">{{ a.appointment_time }}</div>
+              </td>
+              <td>
+                <span class="status-badge status-{{ a.status|lower }}">{{ a.status }}</span>
+              </td>
+              <td style="font-size: 12px; max-width: 200px; color: var(--text-secondary);">
+                {{ a.symptoms or 'General consultation' }}
+              </td>
+              <td style="font-size: 12px; max-width: 220px;">
+                {% if a.doctor_notes or a.prescription %}
+                  <div style="color: var(--status-completed); font-weight: 600; font-size: 11px;">✓ Notes Recorded</div>
+                  <div style="font-size: 11px; color: var(--text-muted);">{{ a.doctor_notes[:40] }}...</div>
+                {% else %}
+                  <span style="color: var(--text-muted); font-size: 11px; font-style: italic;">No clinical entry yet</span>
+                {% endif %}
+              </td>
+              <td style="text-align: center;">
+                <a href="{{ url_for('doctor.consult', appointment_id=a.id) }}" class="btn btn-secondary btn-sm">
+                  Consultation
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="panel-body" style="text-align: center; padding: 30px;">
+        <p style="color: var(--text-muted); font-size: 13px;">No patient consultations currently assigned to your roster.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

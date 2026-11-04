@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}About MetroCare General Hospital{% endblock %}
+
+{% block content %}
+<div class="page-title-bar">
+  <div class="container">
+    <div>
+      <h1 class="page-heading">About MetroCare General Hospital</h1>
+      <div class="page-subheading">Institutional background, administrative structure, and healthcare appointment management system.</div>
+    </div>
+  </div>
+</div>
+
+<div class="container" style="max-width: 900px; padding-bottom: 40px;">
+  <div class="hospital-panel">
+    <div class="panel-header">
+      <h2 class="panel-title">Institutional Overview</h2>
+    </div>
+    <div class="panel-body" style="font-size: 13px; line-height: 1.7; color: var(--text-dark);">
+      <p style="margin-bottom: 12px;">
+        MetroCare General Hospital is a regional multispecialty healthcare center providing comprehensive inpatient and outpatient services. Our Outpatient Department (OPD) functions as the central clinical point of care for diagnosis, treatment planning, preventive medicine, and routine specialist consultations.
+      </p>
+      <p style="margin-bottom: 0;">
+        The Hospital Appointment Management System was developed to transition our clinical scheduling away from manual paper logs into an ACID-compliant digital infrastructure. The platform enables patients to book verified consultation slots without overlapping appointments, while physicians manage their daily queues, review past medical encounters, and generate structured electronic prescriptions.
+      </p>
+    </div>
+  </div>
+
+  <div class="hospital-panel">
+    <div class="panel-header">
+      <h2 class="panel-title">Core System Architecture (College Viva Overview)</h2>
+    </div>
+    <div class="panel-body" style="font-size: 13px; line-height: 1.6;">
+      <table class="hospital-table" style="margin-bottom: 14px;">
+        <thead>
+          <tr>
+            <th style="width: 200px;">Module / Component</th>
+            <th>Implementation Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Relational Database</strong></td>
+            <td>SQLite3 with strict Foreign Key constraints (`PRAGMA foreign_keys = ON`) and `Row` dictionary factory.</td>
+          </tr>
+          <tr>
+            <td><strong>Double-Booking Prevention</strong></td>
+            <td>Multi-tier validation: Pre-insert conflict queries and compound database constraint `UNIQUE(doctor_id, appointment_date, appointment_time, status)`.</td>
+          </tr>
+          <tr>
+            <td><strong>Authentication & Security</strong></td>
+            <td>Werkzeug PBKDF2-SHA256 password hashing; custom `login_required(role)` role-based access control (RBAC).</td>
+          </tr>
+          <tr>
+            <td><strong>Outpatient Agenda & Rx</strong></td>
+            <td>Physician interface recording diagnoses, clinical findings, and electronic prescription lines stored directly on the appointment record.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="hospital-panel">
+    <div class="panel-header">
+      <h2 class="panel-title">Hospital Administration & Emergency Contacts</h2>
+    </div>
+    <div class="panel-body" style="font-size: 13px; line-height: 1.6;">
+      <div class="form-row">
+        <div>
+          <strong>Outpatient Administration Desk:</strong><br>
+          Tel: (555) 019-2834<br>
+          Email: administration@metrocarehospital.org<br>
+          Room 102, Administration Wing
+        </div>
+        <div>
+          <strong>Emergency & Trauma Unit:</strong><br>
+          Tel: (555) 911-0000<br>
+          Ambulance Entrance: Gate 2<br>
+          Available 24 Hours Daily
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

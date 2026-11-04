@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}MetroCare General Hospital — Outpatient Portal{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%200%22%20100%22%20100%22><text y=%22.9em%22 font-size=%2290%22>🏥</text></svg>">
+</head>
+<body>
+  <!-- Hospital Top Info Bar -->
+  <div class="hospital-topbar">
+    <div class="container topbar-content">
+      <div class="topbar-contact">
+        <span>📍 450, Avinashi Road, Peelamedu, Coimbatore, Tamil Nadu – 641004</span>
+        <span>📞 OPD Desk: +91 422 257 0100</span>
+        <span>🕒 OPD Hours: Mon–Sat 08:30 AM – 06:00 PM</span>
+      </div>
+      <div class="topbar-emergency">
+        🚨 Emergency Trauma Department: Open 24/7 (Ph: 108 / 0422 257 0911)
+      </div>
+    </div>
+  </div>
+
+  <!-- Primary Hospital Navigation -->
+  <header class="hospital-navbar">
+    <div class="container nav-container">
+      <a href="{{ url_for('main.index') }}" class="brand-container">
+        <div class="hospital-emblem">✚</div>
+        <div class="brand-titles">
+          <span class="hospital-name">MetroCare General Hospital</span>
+          <span class="hospital-tagline">Clinical Outpatient & Appointment System</span>
+        </div>
+      </a>
+
+      <nav>
+        <ul class="nav-menu">
+          <li><a href="{{ url_for('main.index') }}" class="nav-item-link">Home</a></li>
+          <li><a href="{{ url_for('main.doctors') }}" class="nav-item-link">Find a Doctor</a></li>
+          <li><a href="{{ url_for('main.departments') }}" class="nav-item-link">Clinical Departments</a></li>
+          <li><a href="{{ url_for('main.about') }}" class="nav-item-link">About Hospital</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        {% if session.get('user_id') %}
+          {% if session.get('role') == 'admin' %}
+            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary btn-sm">Admin Console</a>
+          {% elif session.get('role') == 'doctor' %}
+            <a href="{{ url_for('doctor.dashboard') }}" class="btn btn-secondary btn-sm">Doctor Agenda</a>
+          {% else %}
+            <a href="{{ url_for('patient.dashboard') }}" class="btn btn-secondary btn-sm">My Appointments</a>
+            <a href="{{ url_for('patient.book_appointment') }}" class="btn btn-primary btn-sm">Book Appointment</a>
+          {% endif %}
+          <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-danger btn-sm">Log Out</a>
+        {% else %}
+          <a href="{{ url_for('auth.login') }}" class="btn btn-secondary btn-sm">Portal Login</a>
+          <a href="{{ url_for('auth.register') }}" class="btn btn-teal btn-sm">New Patient Registration</a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-container">
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">
+            <span>{{ message }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- Main View Area -->
+  <main style="flex: 1 0 auto;">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Institutional Hospital Footer -->
+  <footer class="hospital-footer">
+    <div class="container">
+      <div class="footer-columns">
+        <div class="footer-col">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+            <div style="background:#FFFFFF; color:#1B365D; font-weight:bold; padding:2px 6px; border-radius:2px; font-size:12px;">✚</div>
+            <strong style="color: #FFFFFF; font-size: 14px;">MetroCare General Hospital</strong>
+          </div>
+          <p style="font-size: 12px; line-height: 1.6; margin-bottom: 8px; color: #CED4DA;">
+            Accredited multispecialty healthcare institution dedicated to patient-centered clinical care, outpatient consultations, and medical education.
+          </p>
+          <div style="font-size: 12px; color: #ADB5BD;">
+            Inquiries: info@metrocarehospital.in | Tel: +91 422 257 0100
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h5>Patient Services</h5>
+          <ul>
+            <li><a href="{{ url_for('main.doctors') }}">Find Medical Specialist</a></li>
+            <li><a href="{{ url_for('main.departments') }}">Clinical Departments</a></li>
+            <li><a href="{{ url_for('patient.book_appointment') }}">Schedule Appointment</a></li>
+            <li><a href="{{ url_for('main.about') }}">Patient Guide & OPD Hours</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>Staff & Portal</h5>
+          <ul>
+            <li><a href="{{ url_for('auth.login') }}">Patient & Staff Portal Login</a></li>
+            <li><a href="{{ url_for('auth.register') }}">New Patient Enrollment</a></li>
+            <li><a href="{{ url_for('main.about') }}">Administrative Information</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>Hospital Location</h5>
+          <p style="font-size: 12px; line-height: 1.5; color: #CED4DA;">
+            Coimbatore Main Campus<br>
+            OPD Pavilion & Specialty Towers<br>
+            450, Avinashi Road, Peelamedu<br>
+            Coimbatore, Tamil Nadu – 641004
+          </p>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>&copy; {{ current_year }} MetroCare General Hospital. All rights reserved. Hospital Appointment Management System.</div>
+        <div>System Version 1.2.0 • Relational DB Build</div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

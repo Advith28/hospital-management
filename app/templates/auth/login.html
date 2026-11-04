@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Hospital Portal Login — MetroCare General Hospital{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 36px 16px; max-width: 480px;">
+  <div class="hospital-panel">
+    <div class="panel-header" style="background-color: var(--hospital-navy); color: #FFFFFF; border-bottom: none;">
+      <h2 class="panel-title" style="color: #FFFFFF; font-size: 15px;">Hospital Portal Login</h2>
+    </div>
+
+    <div class="panel-body">
+      <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px;">
+        Sign in to access patient health records, doctor clinical agenda, or administrative management.
+      </div>
+
+      <!-- Quick Demo Credentials Box for College Evaluators -->
+      <div style="background-color: var(--hospital-teal-light); border: 1px solid #B2F2BB; padding: 10px 12px; border-radius: var(--radius-xs); margin-bottom: 16px; font-size: 11px; line-height: 1.5;">
+        <strong style="color: var(--hospital-teal); display: block; margin-bottom: 2px;">Demonstration Login Credentials:</strong>
+        &bull; <strong>Admin:</strong> <code>admin@mediflow.com</code> / <code>Admin@123</code><br>
+        &bull; <strong>Doctor:</strong> <code>sarah.jenkins@mediflow.com</code> / <code>Doctor@123</code><br>
+        &bull; <strong>Patient:</strong> <code>alex.rivera@example.com</code> / <code>Patient@123</code>
+      </div>
+
+      <form method="POST" action="{{ url_for('auth.login', next=request.args.get('next')) }}">
+        <div class="form-group">
+          <label class="form-label" for="email">Hospital / Patient Email <span class="req">*</span></label>
+          <input type="email" id="email" name="email" class="form-control" placeholder="user@example.com" value="{{ email or '' }}" required autofocus>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password <span class="req">*</span></label>
+          <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top: 16px;">
+          Sign In
+        </button>
+      </form>
+
+      <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border-light); font-size: 12px; text-align: center; color: var(--text-muted);">
+        First-time outpatient?
+        <a href="{{ url_for('auth.register') }}" style="font-weight: 600;">Register New Patient Profile</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% block title %}Physicians Roster Management — MetroCare General Hospital{% endblock %}
+
+{% block content %}
+<div class="page-title-bar">
+  <div class="container">
+    <div>
+      <h1 class="page-heading">Hospital Medical Staff & Physician Roster</h1>
+      <div class="page-subheading">Manage attending medical faculty, clinical department assignments, and consultation fees.</div>
+    </div>
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary btn-sm">&larr; Back to Dashboard</a>
+  </div>
+</div>
+
+<div class="container" style="padding-bottom: 40px;">
+  <div style="display: grid; grid-template-columns: 1.8fr 1.2fr; gap: 20px;">
+    <!-- Physicians Roster Table -->
+    <div class="hospital-panel">
+      <div class="panel-header">
+        <h2 class="panel-title">Active Attending Physicians ({{ doctors|length }})</h2>
+      </div>
+      <div class="table-wrapper" style="border: none;">
+        <table class="hospital-table">
+          <thead>
+            <tr>
+              <th>Physician</th>
+              <th>Department & Specialty</th>
+              <th>Fee</th>
+              <th>Visits</th>
+              <th style="text-align: center;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for doc in doctors %}
+            <tr>
+              <td>
+                <strong>{{ doc.full_name }}</strong>
+                <div style="font-size: 11px; color: var(--text-muted);">{{ doc.email }} &bull; {{ doc.experience_years }}y exp</div>
+              </td>
+              <td>
+                <span class="status-badge status-scheduled">{{ doc.department_name }}</span>
+                <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">{{ doc.specialization }}</div>
+              </td>
+              <td><strong>₹{{ "%.0f"|format(doc.consultation_fee) }}</strong></td>
+              <td>{{ doc.appointment_count }}</td>
+              <td style="text-align: center;">
+                <form method="POST" action="{{ url_for('admin.delete_doctor', doctor_id=doc.id) }}" onsubmit="return confirm('Confirm removal of {{ doc.full_name }} from hospital staff?');">
+                  <button type="submit" class="btn btn-outline-danger btn-sm">Remove</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Onboard Doctor Form -->
+    <div class="hospital-panel" style="height: fit-content;">
+      <div class="panel-header">
+        <h2 class="panel-title">+ Onboard Attending Physician</h2>
+      </div>
+      <div class="panel-body">
+        <form method="POST" action="{{ url_for('admin.doctors') }}">
+          <div class="form-group">
+            <label class="form-label" for="full_name">Doctor Full Name <span class="req">*</span></label>
+            <input type="text" id="full_name" name="full_name" class="form-control" placeholder="Dr. Full Name, MD" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="email">Hospital Email <span class="req">*</span></label>
+            <input type="email" id="email" name="email" class="form-control" placeholder="physician@metrocarehospital.in" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="department_id">Department <span class="req">*</span></label>
+              <select id="department_id" name="department_id" class="form-select" required>
+                <option value="">Select Department</option>
+                {% for d in departments %}
+                  <option value="{{ d.id }}">{{ d.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="consultation_fee">Fee (₹ INR)</label>
+              <input type="number" id="consultation_fee" name="consultation_fee" class="form-control" value="600" step="1" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="specialization">Clinical Specialization <span class="req">*</span></label>
+            <input type="text" id="specialization" name="specialization" class="form-control" placeholder="e.g. Interventional Cardiology" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="qualification">Qualifications</label>
+            <input type="text" id="qualification" name="qualification" class="form-control" placeholder="e.g. MD, FACC - Harvard Medical" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="experience_years">Experience (Yrs)</label>
+              <input type="number" id="experience_years" name="experience_years" class="form-control" value="5" min="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="phone">Phone</label>
+              <input type="tel" id="phone" name="phone" class="form-control" placeholder="+1 (555) 000-0000">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="bio">Biography / Clinical Notes</label>
+            <textarea id="bio" name="bio" class="form-control" placeholder="Brief clinical background..."></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" style="margin-top: 8px;">
+            Save & Add Physician
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

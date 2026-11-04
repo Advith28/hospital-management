@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Clinical Departments — MetroCare General Hospital{% endblock %}
+
+{% block content %}
+<div class="page-title-bar">
+  <div class="container">
+    <div>
+      <h1 class="page-heading">Hospital Clinical Departments</h1>
+      <div class="page-subheading">Outpatient divisions, specialized clinics, and attending medical faculty.</div>
+    </div>
+    <a href="{{ url_for('main.doctors') }}" class="btn btn-secondary btn-sm">Find a Doctor</a>
+  </div>
+</div>
+
+<div class="container" style="padding-bottom: 30px;">
+  <div class="table-wrapper">
+    <table class="hospital-table">
+      <thead>
+        <tr>
+          <th style="width: 220px;">Department Name</th>
+          <th>Clinical Scope & Treatments</th>
+          <th style="width: 130px; text-align: center;">Attending Staff</th>
+          <th style="width: 160px; text-align: center;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for dept in departments %}
+        <tr>
+          <td>
+            <strong style="color: var(--hospital-navy); font-size: 14px;">{{ dept.name }}</strong>
+            <div style="font-size: 11px; color: var(--text-muted);">Division of Outpatient Medicine</div>
+          </td>
+          <td style="font-size: 13px; line-height: 1.5;">
+            {{ dept.description }}
+          </td>
+          <td style="text-align: center;">
+            <span class="status-badge status-scheduled">{{ dept.doctor_count }} Attending{{ 's' if dept.doctor_count != 1 else '' }}</span>
+          </td>
+          <td style="text-align: center;">
+            <a href="{{ url_for('main.doctors', department=dept.id) }}" class="btn btn-secondary btn-sm">
+              View Specialists &rarr;
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

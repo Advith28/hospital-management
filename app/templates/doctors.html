@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block title %}Find Attending Doctors — MetroCare General Hospital{% endblock %}
+
+{% block content %}
+<div class="page-title-bar">
+  <div class="container">
+    <div>
+      <h1 class="page-heading">Hospital Medical Staff & Specialist Directory</h1>
+      <div class="page-subheading">Directory of active attending physicians, clinical credentials, and OPD consultation schedules.</div>
+    </div>
+    <a href="{{ url_for('patient.book_appointment') if session.get('role') == 'patient' else url_for('auth.login') }}" class="btn btn-primary btn-sm">
+      Book Appointment
+    </a>
+  </div>
+</div>
+
+<div class="container" style="padding-bottom: 30px;">
+  <!-- Filter & Search Toolbar -->
+  <div class="hospital-panel" style="margin-bottom: 16px;">
+    <div class="panel-body" style="padding: 12px 16px;">
+      <form method="GET" action="{{ url_for('main.doctors') }}" style="display: grid; grid-template-columns: 2fr 1.5fr auto auto; gap: 10px; align-items: flex-end;">
+        <div>
+          <label class="form-label" style="font-size: 12px; margin-bottom: 2px;">Search by Physician Name or Specialty</label>
+          <input type="text" name="search" class="form-control" placeholder="e.g. Jenkins, Cardiology, Stanford..." value="{{ search_query }}">
+        </div>
+        <div>
+          <label class="form-label" style="font-size: 12px; margin-bottom: 2px;">Department Filter</label>
+          <select name="department" class="form-select">
+            <option value="">All Departments</option>
+            {% for d in departments %}
+              <option value="{{ d.id }}" {% if selected_dept|string == d.id|string %}selected{% endif %}>{{ d.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <button type="submit" class="btn btn-primary" style="height: 33px;">Filter</button>
+        </div>
+        <div>
+          <a href="{{ url_for('main.doctors') }}" class="btn btn-secondary" style="height: 33px;">Reset</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Doctors Roster List -->
+  {% if doctors %}
+    <div>
+      {% for doc in doctors %}
+      <div class="doctor-row-card">
+        <div>
+          <div style="display: flex; align-items: baseline; gap: 8px;">
+            <h3 style="font-size: 15px; font-weight: 700; color: var(--hospital-navy); margin: 0;">{{ doc.full_name }}</h3>
+            <span style="font-size: 12px; color: var(--hospital-teal); font-weight: 600;">{{ doc.specialization }}</span>
+          </div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 3px;">
+            <strong>Qualifications:</strong> {{ doc.qualification }} &bull; <strong>Clinical Experience:</strong> {{ doc.experience_years }} Years
+          </div>
+          <p style="font-size: 12px; color: var(--text-secondary); margin-top: 6px; margin-bottom: 0; line-height: 1.4;">
+            {{ doc.bio }}
+          </p>
+        </div>
+
+        <div style="font-size: 12px; border-left: 1px solid var(--border-light); padding-left: 12px;">
+          <div style="font-weight: 600; color: var(--text-dark);">Department: {{ doc.department_name }}</div>
+          <div style="color: var(--text-muted); margin-top: 2px;">Hours: {{ doc.slot_start_time }} – {{ doc.slot_end_time }}</div>
+          <div style="color: var(--text-muted); margin-top: 2px;">Days: {{ doc.available_days }}</div>
+        </div>
+
+        <div style="text-align: right; border-left: 1px solid var(--border-light); padding-left: 12px;">
+          <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted);">Consultation Fee</div>
+          <div style="font-size: 16px; font-weight: 700; color: var(--hospital-navy);">₹{{ "%.0f"|format(doc.consultation_fee) }}</div>
+        </div>
+
+        <div>
+          <a href="{{ url_for('patient.book_appointment', doctor_id=doc.id) }}" class="btn btn-primary btn-sm">
+            Book Appointment
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="hospital-panel" style="padding: 30px; text-align: center;">
+      <h3 style="font-size: 15px; font-weight: 700; color: var(--text-dark);">No Physicians Found</h3>
+      <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">No hospital doctors matched your search criteria. Please adjust your search terms.</p>
+      <a href="{{ url_for('main.doctors') }}" class="btn btn-secondary btn-sm" style="margin-top: 8px;">Clear Filters</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

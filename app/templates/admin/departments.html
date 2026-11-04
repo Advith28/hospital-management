@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}Clinical Department Management — MetroCare General Hospital{% endblock %}
+
+{% block content %}
+<div class="page-title-bar">
+  <div class="container">
+    <div>
+      <h1 class="page-heading">Hospital Clinical Departments & Divisions</h1>
+      <div class="page-subheading">Configure hospital medical departments, outpatient scopes, and staff allocations.</div>
+    </div>
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary btn-sm">&larr; Back to Dashboard</a>
+  </div>
+</div>
+
+<div class="container" style="padding-bottom: 40px;">
+  <div style="display: grid; grid-template-columns: 1.8fr 1.2fr; gap: 20px;">
+    <!-- Departments List -->
+    <div class="hospital-panel">
+      <div class="panel-header">
+        <h2 class="panel-title">Active Clinical Departments ({{ departments|length }})</h2>
+      </div>
+      <div class="table-wrapper" style="border: none;">
+        <table class="hospital-table">
+          <thead>
+            <tr>
+              <th style="width: 180px;">Department</th>
+              <th>Clinical Scope & Outpatient Services</th>
+              <th style="width: 120px; text-align: center;">Attending Staff</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for d in departments %}
+            <tr>
+              <td>
+                <strong style="color: var(--hospital-navy);">{{ d.name }}</strong>
+              </td>
+              <td style="font-size: 12px; color: var(--text-secondary); line-height: 1.4;">
+                {{ d.description }}
+              </td>
+              <td style="text-align: center;">
+                <span class="status-badge status-scheduled">{{ d.doctor_count }} Attending{{ 's' if d.doctor_count != 1 else '' }}</span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Create Department Form -->
+    <div class="hospital-panel" style="height: fit-content;">
+      <div class="panel-header">
+        <h2 class="panel-title">+ Add Clinical Department</h2>
+      </div>
+      <div class="panel-body">
+        <form method="POST" action="{{ url_for('admin.departments') }}">
+          <div class="form-group">
+            <label class="form-label" for="name">Department Name <span class="req">*</span></label>
+            <input type="text" id="name" name="name" class="form-control" placeholder="e.g. Ophthalmology, Oncology" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="icon">Icon / Identifier Tag</label>
+            <input type="text" id="icon" name="icon" class="form-control" value="stethoscope">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="description">Clinical Scope & Treatments <span class="req">*</span></label>
+            <textarea id="description" name="description" class="form-control" style="min-height: 90px;" placeholder="Describe clinical scope, outpatient procedures, and treatments..." required></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" style="margin-top: 8px;">
+            Save & Add Department
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

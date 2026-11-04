@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}Book Consultation — MetroCare General Hospital{% endblock %}
+
+{% block content %}
+<div class="page-title-bar">
+  <div class="container">
+    <div>
+      <h1 class="page-heading">Schedule Outpatient Consultation</h1>
+      <div class="page-subheading">Select attending physician, consultation date, and available time slot.</div>
+    </div>
+    <a href="{{ url_for('patient.dashboard') }}" class="btn btn-secondary btn-sm">&larr; Back to Dashboard</a>
+  </div>
+</div>
+
+<div class="container" style="max-width: 760px; padding-bottom: 40px;">
+  <div class="hospital-panel">
+    <div class="panel-header">
+      <h2 class="panel-title">Outpatient Booking Form</h2>
+    </div>
+
+    <div class="panel-body">
+      <form method="POST" action="{{ url_for('patient.book_appointment') }}">
+        <!-- Step 1: Doctor Choice -->
+        <div class="form-group">
+          <label class="form-label" for="doctor_select">1. Select Attending Physician <span class="req">*</span></label>
+          <select id="doctor_select" name="doctor_id" class="form-select" required>
+            <option value="">-- Choose Attending Physician --</option>
+            {% for doc in doctors %}
+              <option value="{{ doc.id }}" {% if preselected_doc_id and preselected_doc_id == doc.id %}selected{% endif %}>
+                {{ doc.full_name }} — {{ doc.department_name }} ({{ doc.specialization }})
+              </option>
+            {% endfor %}
+          </select>
+          <div id="slot_status_text" class="form-help"></div>
+        </div>
+
+        <!-- Step 2: Date Choice & Fee Display -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="appointment_date">2. Consultation Date <span class="req">*</span></label>
+            <input type="date" id="appointment_date" name="appointment_date" class="form-control" min="{{ min_date }}" max="{{ max_date }}" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Consultation Fee</label>
+            <div id="consultation_fee_display" style="padding: 7px 10px; background-color: var(--bg-subtle); border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-weight: 700; color: var(--hospital-navy); font-size: 13px;">
+              --
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: Available Consultation Slots -->
+        <div class="form-group">
+          <label class="form-label">3. Select Open Consultation Slot <span class="req">*</span></label>
+          <input type="hidden" id="appointment_time" name="appointment_time" required>
+          <div id="slots_container" class="slot-container" style="min-height: 50px; padding: 10px; background-color: #FAFAFA; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+            <div style="font-size: 12px; color: var(--text-muted); grid-column: 1/-1;">
+              Please select an attending physician and consultation date above to display available slots.
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4: Reason / Symptoms -->
+        <div class="form-group">
+          <label class="form-label" for="symptoms">4. Chief Symptoms / Purpose of Consultation</label>
+          <textarea id="symptoms" name="symptoms" class="form-control" placeholder="Specify symptoms, approximate duration, or clinical reasons for visit..."></textarea>
+        </div>
+
+        <!-- Form Actions -->
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+          <a href="{{ url_for('patient.dashboard') }}" class="btn btn-secondary">Cancel</a>
+          <button type="submit" class="btn btn-primary">
+            Confirm & Book Appointment
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block title %}Physician Clinic Schedule — MetroCare General Hospital{% endblock %}
+
+{% block content %}
+<div class="page-title-bar">
+  <div class="container">
+    <div>
+      <h1 class="page-heading">Clinic Availability & Practice Settings</h1>
+      <div class="page-subheading">Update consultation hours, fee, slot intervals, and practice days.</div>
+    </div>
+    <a href="{{ url_for('doctor.dashboard') }}" class="btn btn-secondary btn-sm">&larr; Back to Portal</a>
+  </div>
+</div>
+
+<div class="container" style="max-width: 800px; padding-bottom: 40px;">
+  <div class="hospital-panel">
+    <div class="panel-header">
+      <h2 class="panel-title">Attending Physician Profile & Schedule Configuration</h2>
+    </div>
+
+    <div class="panel-body">
+      <form method="POST" action="{{ url_for('doctor.schedule') }}">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="specialization">Clinical Specialization <span class="req">*</span></label>
+            <input type="text" id="specialization" name="specialization" class="form-control" value="{{ doctor.specialization }}" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="qualification">Degrees & Medical Credentials <span class="req">*</span></label>
+            <input type="text" id="qualification" name="qualification" class="form-control" value="{{ doctor.qualification }}" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="experience_years">Years in Practice <span class="req">*</span></label>
+            <input type="number" id="experience_years" name="experience_years" class="form-control" min="0" value="{{ doctor.experience_years }}" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="consultation_fee">Consultation Fee (₹ INR) <span class="req">*</span></label>
+            <input type="number" id="consultation_fee" name="consultation_fee" step="1" class="form-control" value="{{ doctor.consultation_fee }}" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Weekly OPD Clinic Days</label>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px;">
+            {% for day in all_weekdays %}
+              <label style="display: flex; align-items: center; gap: 4px; background: #FFFFFF; padding: 4px 8px; border: 1px solid var(--border-color); border-radius: var(--radius-xs); cursor: pointer; font-size: 12px;">
+                <input type="checkbox" name="days" value="{{ day }}" {% if day in doctor_days %}checked{% endif %}>
+                <span>{{ day[:3] }}</span>
+              </label>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="slot_start_time">Shift Start Time <span class="req">*</span></label>
+            <input type="time" id="slot_start_time" name="slot_start_time" class="form-control" value="{{ doctor.slot_start_time }}" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="slot_end_time">Shift End Time <span class="req">*</span></label>
+            <input type="time" id="slot_end_time" name="slot_end_time" class="form-control" value="{{ doctor.slot_end_time }}" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="slot_duration_mins">Slot Interval <span class="req">*</span></label>
+            <select id="slot_duration_mins" name="slot_duration_mins" class="form-select">
+              <option value="15" {% if doctor.slot_duration_mins == 15 %}selected{% endif %}>15 Minutes</option>
+              <option value="20" {% if doctor.slot_duration_mins == 20 %}selected{% endif %}>20 Minutes</option>
+              <option value="30" {% if doctor.slot_duration_mins == 30 %}selected{% endif %}>30 Minutes</option>
+              <option value="45" {% if doctor.slot_duration_mins == 45 %}selected{% endif %}>45 Minutes</option>
+              <option value="60" {% if doctor.slot_duration_mins == 60 %}selected{% endif %}>60 Minutes</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="bio">Physician Clinical Biography</label>
+          <textarea id="bio" name="bio" class="form-control" style="min-height: 80px;">{{ doctor.bio or '' }}</textarea>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+          <a href="{{ url_for('doctor.dashboard') }}" class="btn btn-secondary">Discard</a>
+          <button type="submit" class="btn btn-primary">Update Clinic Settings</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
